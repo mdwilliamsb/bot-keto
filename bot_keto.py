@@ -1,12 +1,12 @@
+import os
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 import openai
 
 # === CONFIGURACIÓN ===
-TELEGRAM_TOKEN = '8127077782:AAFv-qiwF3kLRg_4NbSw853HvDOAA2y4od0'  # tu token real
-OPENAI_API_KEY = 'TU_API_KEY_DE_OPENAI'  # ← aquí pon tu API key de OpenAI (comienza con sk-)
-
+TELEGRAM_TOKEN = os.environ['TELEGRAM_TOKEN']
+OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 openai.api_key = OPENAI_API_KEY
 
 # === PROMPT PERSONALIZADO ===
@@ -25,7 +25,7 @@ Tu comportamiento debe seguir estas reglas:
 # === FUNCIÓN DE RESPUESTA GPT ===
 async def responder(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mensaje_usuario = update.message.text
-    nombre_usuario = update.message.from_user.first_name or "Amig@"  # por si no hay nombre
+    nombre_usuario = update.message.from_user.first_name or "Amig@"
 
     mensajes = [
         {"role": "system", "content": PROMPT_CETOGENICO},
@@ -44,6 +44,10 @@ async def responder(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Error: {e}")
         await update.message.reply_text("Lo siento, ocurrió un error. Intenta más tarde.")
 
-# === CONFIGURACIÓN DEL BOT ===
+# === INICIAR EL BOT ===
 if __name__ == '__main__':
-    logging.basicConfig(level
+    logging.basicConfig(level=logging.INFO)
+    app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, responder))
+    print("Bot activo")
+    app.run_polling()
