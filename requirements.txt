@@ -1,2 +1,6 @@
-python-telegram-bot==20.3
-openai==0.28.1
+google-cloud-texttospeech
+PyMuPDF
+python-docx
+pydub
+pygame
+python-dotenv
